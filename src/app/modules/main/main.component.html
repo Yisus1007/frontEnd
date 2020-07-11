@@ -1,33 +1,99 @@
 <div class="container">
-    <h1 class="header">Persons handling</h1>
+    <div class="row">
+        <div>
+            <h1 class="header">Persons handling</h1>
+        </div>
+    </div>  
+    <div class="row">
+        <div class="col-12">
+            <button class="btn btn-success float-right" data-toggle="modal" data-target="#modalAdd">Add New</button>
+        </div>
+    </div>
     <br>
-    <table class="table table-striped table table-bordered">
-        <thead class="table-success">
-            <tr class="text-center">
-                <th>Rut</th>
-                <th>Name</th>
-                <th>Last Name</th>
-                <th>Age</th>
-                <th>Adress</th>
-                <th>Edit/Delete</th>
-            </tr>
-        </thead>
-        <tbody *ngFor="let items of peopleList">
-            <tr class="text-center">
-                <td>{{items.rut}}</td>
-                <td>{{items.name}}</td>
-                <td>{{items.lastName}}</td>
-                <td>{{items.age}}</td>
-                <td>{{items.adress}}</td>
-                <td>
-                    <button type="button" class="btn btn-success separator">
-                        Edit
-                    </button>
-                    <button type="button" class="btn btn-danger" (click)="deletePeople(items.rut)">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="row">
+        <table class="table table-striped table table-bordered">
+            <thead class="table-success">
+                <tr class="text-center">
+                    <th>Rut</th>
+                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>Age</th>
+                    <th>Adress</th>
+                    <th>Edit/Delete</th>
+                </tr>
+            </thead>
+            <tbody *ngFor="let items of peopleList">
+                <tr class="text-center">
+                    <td>{{items.rut}}</td>
+                    <td>{{items.name}}</td>
+                    <td>{{items.lastName}}</td>
+                    <td>{{items.age}}</td>
+                    <td>{{items.adress}}</td>
+                    <td>
+                        <button type="button" class="btn btn-success separator">
+                            Edit
+                        </button>
+                        <button type="button" class="btn btn-danger" (click)="deletePeople(items.rut)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="modalAdd" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLongTitle">Add new People</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form [formGroup]="formPeople" (ngSubmit)="addPeople()">
+            <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="forRut">RUT</label>
+                            <input type="text" class="form-control" placeholder="Enter RUT" formControlName="rut" id="forRut" aria-describedby="rutHelp" 
+                            required (change)=validateRut() value="{{rutString}}"> 
+                            <small id="rutHelp" class="form-text text-muted">Example: 1234567-1</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="forName">Name</label>
+                            <input type="text" class="form-control" placeholder="Enter Name" formControlName="name" id="forName" maxlength="50" required>
+                        </div>               
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="forLastName">Last Name</label>
+                            <input type="text" class="form-control" placeholder="Enter Last Name" formControlName="lastName" id="forLastName" maxlength="60" required>
+                        </div>               
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="ageSelect">Age</label>
+                            <input type="text" class="form-control" placeholder="Enter your Age" formControlName="age" id="forLastName" maxlength="2" 
+                            (change)="validateAge()">
+                        </div>               
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="ageSelect">Adress</label>
+                            <textarea  class="form-control" placeholder="Enter your Age" formControlName="adress" id="forLastName" maxlength="400"></textarea>
+                        </div>               
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" (click)="formPeople.reset()">Clear</button>
+                <button type="button" class="btn btn-success" type="submit">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="formPeople.reset()">Close</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
