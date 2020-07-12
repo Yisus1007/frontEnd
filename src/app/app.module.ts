@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { MainComponent } from './modules/main/main.component';
 import { HttpClientModule } from '@angular/common/http';
 import { Services } from './services/services';
+import { ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
     AppComponent,
@@ -14,7 +15,8 @@ import { Services } from './services/services';
   imports: [
     BrowserModule,
     AppRoutingModule,    
-    HttpClientModule    
+    HttpClientModule,
+    ReactiveFormsModule, 
   ],
   providers: [
     Services
