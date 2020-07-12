@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormGroup, FormBuilder, Validators} from '@angular/forms';
+import {FormGroup, FormBuilder, Validators, FormControl} from '@angular/forms';
 import { Services } from '../../services/services';
 
 @Component({
@@ -10,9 +10,16 @@ import { Services } from '../../services/services';
 export class MainComponent implements OnInit {
 
   formPeople: FormGroup;
+  formPeopleEdit: FormGroup;
   constructor(private services: Services,private formBuilder: FormBuilder) { }
   public peopleList: Array<string>;
   public rutString: string;
+  public name: string;
+  public lastName: string;
+  public age: string;
+  public adress: string;
+  public isNew: boolean = false;
+
 
   ngOnInit(): void {
     console.log('ngOnInit - ingreso');
@@ -20,13 +27,21 @@ export class MainComponent implements OnInit {
     this.createForm();
   }
   createForm(){
-    this.formPeople = this.formBuilder.group({
-      rut: ['', Validators.required],
+    this.formPeople = this.formBuilder.group ({
+      rut: '',
       name: '',
       lastName: '',
       age: '',
-      adress: ''
+      adress: '',
     });
+    this.formPeopleEdit= this.formBuilder.group ({
+      rut: {value: '', disable: true},
+      name: '',
+      lastName: '',
+      age: '',
+      adress: '',
+    });
+    
 
   }
   /**
@@ -67,7 +82,7 @@ export class MainComponent implements OnInit {
    * Does age validation, if the age is less 18 return an alert
    */
   public validateAge(){
-    if(this.formPeople.value.age < 18){
+    if(this.formPeople.value.age < 18 && this.formPeople.value.age != null){
       alert("You must be over 18 years old");
       return false;
     }
@@ -79,8 +94,20 @@ export class MainComponent implements OnInit {
    * and reload the main table
    */
   public addPeople(){
-    console.log('Main - addPeople - ingreso');
-    console.log("Main - addPeople - contiene: " + this.formPeople.value);
+    console.log('Main - addPeople - Init');    
+    this.formPeople.value.rut = this.rutString; 
+    console.log("Main - addPeople - params: ", this.formPeople.value);
+    this.services.addPeople(this.formPeople.value).then((addResponse)=>{
+      console.log("Main - addPeople - addResponse: ", addResponse);
+      if(addResponse['statusCode'] == 200){
+        this.getPeopleList();
+        this.formPeople.reset();
+      }
+    }).catch((errorResponse)=>{
+      console.log("Main - addPeople - errorResponse: ", errorResponse);
+      alert("Error trying to insert: "+ errorResponse);
+    });
+
   }
 
   /**
@@ -92,26 +119,30 @@ export class MainComponent implements OnInit {
    */
   validateRut(){
     console.log("Main - validateRut - Init")
-    var rut = this.formPeople.value.rut;
-    console.log("rut.charAt('-'): ",rut.indexOf('-'))
-    if(rut.indexOf('-') == -1){
-      alert("RUT must be contain a hyphen");
+    if(this.formPeople.value.rut != null)
+    {
+      var rut = this.formPeople.value.rut;
+      console.log("rut.charAt('-'): ",rut.indexOf('-'))
+      if(rut.indexOf('-') == -1){
+        alert("RUT must be contain a hyphen");
+      }
+      console.log("rut size: ", rut.length);
+      console.log("rut: ", rut);
+      if(rut.length < 9){
+        alert("It's not a valid RUT");
+      }
+      rut = rut.replace('-','');
+      var rutBody = rut.substring(0,rut.length -1);
+      var rutDv: string = rut.substring(rut.length,rut.length -1);
+      var dvValidation: boolean = this.validateVD(rutBody, rutDv);
+      if(!dvValidation){
+        console.log("verification digit is invalid");
+        alert("verification digit is invalid");
+      }
+      this.rutString = this.formatRut(rutBody) + "-" + rutDv.toUpperCase(); 
+      this.formPeople.value.rut = this.rutString; 
+      console.log("Main - validateRut - End")
     }
-    console.log("rut size: ", rut.length);
-    console.log("rut: ", rut);
-    if(rut.length < 9){
-      alert("It's not a valid RUT");
-    }
-    rut = rut.replace('-','');
-    var rutBody = rut.substring(0,rut.length -1);
-    var rutDv: string = rut.substring(rut.length,rut.length -1);
-    var dvValidation: boolean = this.validateVD(rutBody, rutDv);
-    if(!dvValidation){
-      console.log("verification digit is invalid");
-      alert("verification digit is invalid");
-    }
-    this.rutString = this.formatRut(rutBody) + "-" + rutDv.toUpperCase();  
-    console.log("Main - validateRut - End")
     
   }
 
@@ -165,6 +196,41 @@ export class MainComponent implements OnInit {
       console.log("formatted Rut: ",rut1 + "."+ rut2 + "." + rut3);
       return rut1 + "."+ rut2 + "." + rut3;
     }
+  }
+  /**
+   * Load a form to edit modal to fianally show it.
+   * @param items 
+   */
+  selectedToEdit(items){
+    console.log("Main - selectedToEdit - init");
+    console.log("Main - selectedToEdit - param: ",items);
+    this.formPeopleEdit.controls.rut.disable();
+    this.formPeopleEdit.setValue({
+      rut: items.rut,
+      name: items.name, 
+      lastName: items.lastName, 
+      age: items.age, 
+      adress: items.adress
+    });
+    this.rutString = items.rut;
+  }
+  /**
+   * This method invoke to editPeople services and send 
+   * by parameter the list with person that need it edit.
+   */
+  public editPeople(){
+    console.log('Main - editPeople - Init');   
+    console.log("Main - editPeople - params: ", this.formPeopleEdit.value);    
+    this.services.editPeople(this.formPeopleEdit.value,this.rutString).then((editPeopleResponse)=>{   
+      console.log("Main - editPeople - editPeople: ", editPeopleResponse);
+      if(editPeopleResponse['statusCode'] == 200){
+        this.getPeopleList();
+      }
+    }).catch((errorResponse)=>{
+      console.log("Main - editPeople - errorResponse: ", errorResponse);
+      alert("Error trying to update: "+ errorResponse);
+    });
+
   }
 
 }

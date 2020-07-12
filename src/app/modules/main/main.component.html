@@ -30,7 +30,8 @@
                     <td>{{items.age}}</td>
                     <td>{{items.adress}}</td>
                     <td>
-                        <button type="button" class="btn btn-success separator">
+                        <button type="button" class="btn btn-success separator" (click)="selectedToEdit(items)" data-toggle="modal" 
+                        data-target="#modalEdit">
                             Edit
                         </button>
                         <button type="button" class="btn btn-danger" (click)="deletePeople(items.rut)">
@@ -42,15 +43,12 @@
         </table>
     </div>
 </div>
-<!-- Modal -->
+<!-- Modal add -->
 <div class="modal fade" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="modalAdd" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Add new People</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+          <h5 class="modal-title center-aling" id="modalAddTitle">Add new People</h5>
         </div>
         <form [formGroup]="formPeople" (ngSubmit)="addPeople()">
             <div class="modal-body">
@@ -58,7 +56,7 @@
                         <div class="col">
                             <label for="forRut">RUT</label>
                             <input type="text" class="form-control" placeholder="Enter RUT" formControlName="rut" id="forRut" aria-describedby="rutHelp" 
-                            required (change)=validateRut() value="{{rutString}}"> 
+                            required (change)=validateRut() value={{rutString}}> 
                             <small id="rutHelp" class="form-text text-muted">Example: 1234567-1</small>
                         </div>
                     </div>
@@ -84,7 +82,7 @@
                     <div class="row">
                         <div class="col">
                             <label for="ageSelect">Adress</label>
-                            <textarea  class="form-control" placeholder="Enter your Age" formControlName="adress" id="forLastName" maxlength="400"></textarea>
+                            <textarea  class="form-control" placeholder="Enter your adress" formControlName="adress" id="forLastName" maxlength="400"></textarea>
                         </div>               
                     </div>
             </div>
@@ -96,4 +94,56 @@
         </form>
       </div>
     </div>
-  </div>
+</div>
+<!-- Modal add end -->
+<!-- Modal edit -->
+<div class="modal fade" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modalEdit" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEditTitle">Edit People</h5>
+        </div>
+        <form [formGroup]="formPeopleEdit" (ngSubmit)=editPeople()>
+            <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label for="forRut">RUT</label>
+                            <input type="text" class="form-control" formControlName="rut" id="forRut" aria-describedby="rutHelp" 
+                            required (change)=validateRut()  required>  
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="forName">Name</label>
+                            <input type="text" class="form-control" formControlName="name" id="forName" maxlength="50" value="{{name}}" required>
+                        </div>               
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="forLastName">Last Name</label>
+                            <input type="text" class="form-control" formControlName="lastName" id="forLastName" maxlength="60"  value="{{lastName}}" required>
+                        </div>               
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="ageSelect">Age</label>
+                            <input type="text" class="form-control" formControlName="age" id="forLastName" value="{{age}}" maxlength="2" 
+                            (change)="validateAge()">
+                        </div>               
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="ageSelect">Adress</label>
+                            <textarea  class="form-control" value="{{adress}}" formControlName="adress" id="forLastName" maxlength="400"></textarea>
+                        </div>               
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" type="submit" >Edit</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" (click)="formPeople.reset()">Close</button>
+            </div>
+        </form>
+      </div>
+    </div>
+</div>
+<!-- Modal edit end -->
