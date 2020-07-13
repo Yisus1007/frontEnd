@@ -232,5 +232,9 @@ export class MainComponent implements OnInit {
     });
 
   }
+  public clean(){    
+    this.rutString = null;
+    this.formPeople.reset();
+  }
 
 }
